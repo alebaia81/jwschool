@@ -138,6 +138,18 @@ function renderTable() {
         const realIndex = assignmentsData.indexOf(item);
         const tr = document.createElement('tr');
 
+        if (item.sentWhatsApp || item.sentTelegram) {
+            tr.classList.add('row-sent');
+        }
+
+        const waBtn = item.sentWhatsApp
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria WhatsApp inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentWhatsApp')">✅ Inviato WA</button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 WhatsApp</button>`;
+
+        const tgBtn = item.sentTelegram
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria Telegram inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ Inviato TG</button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 Telegram</button>`;
+
         tr.innerHTML = `
             <td>
                 <input type="text" class="cell-input" value="${escapeHtml(item.data)}" onchange="updateItem(${realIndex}, 'data', this.value)">
@@ -156,17 +168,18 @@ function renderTable() {
             </td>
             <td class="text-center" style="white-space: nowrap;">
                 <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ Scarica</button>
-                <button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 WhatsApp</button>
-                <button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 Telegram</button>
+                ${waBtn}
+                ${tgBtn}
             </td>
         `;
 
         tableBody.appendChild(tr);
     });
 
+    const sentCount = assignmentsData.filter(a => a.sentWhatsApp || a.sentTelegram).length;
     const summaryElem = document.getElementById('extractionSummary');
     if (summaryElem) {
-        summaryElem.innerText = `Visualizzando ${filtered.length} di ${assignmentsData.length} assegnazioni totali.`;
+        summaryElem.innerText = `Visualizzando ${filtered.length} di ${assignmentsData.length} assegnazioni totali • Promemoria inviati: ${sentCount} di ${assignmentsData.length}`;
     }
 }
 
@@ -320,6 +333,10 @@ function sendWhatsApp(index) {
     const item = assignmentsData[index];
     if (!item) return;
 
+    item.sentWhatsApp = true;
+    renderTable();
+    showToast(`✅ Promemoria WhatsApp inviato a ${item.studente || 'lo studente'}`);
+
     let msg = `Ciao ${item.studente || ''}, ti ricordo la tua assegnazione per l'adunanza del ${item.data}:\n\n` +
               `• Parte n. ${item.parte_n}: ${item.tipo}`;
 
@@ -338,6 +355,10 @@ function sendTelegram(index) {
     const item = assignmentsData[index];
     if (!item) return;
 
+    item.sentTelegram = true;
+    renderTable();
+    showToast(`✅ Promemoria Telegram inviato a ${item.studente || 'lo studente'}`);
+
     let msg = `Ciao ${item.studente || ''}, ti ricordo la tua assegnazione per l'adunanza del ${item.data}:\n\n` +
               `• Parte n. ${item.parte_n}: ${item.tipo}`;
 
@@ -350,4 +371,14 @@ function sendTelegram(index) {
     const encodedMsg = encodeURIComponent(msg);
     const telegramUrl = `https://t.me/share/url?url=&text=${encodedMsg}`;
     window.open(telegramUrl, '_blank');
+}
+
+function toggleSentStatus(index, key) {
+    const item = assignmentsData[index];
+    if (!item) return;
+
+    item[key] = !item[key];
+    renderTable();
+    const statusText = item[key] ? 'marca come inviato' : 'ripristinato come da inviare';
+    showToast(`🔄 Stato promemoria per ${item.studente}: ${statusText}`);
 }
