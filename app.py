@@ -6,8 +6,6 @@ Servizio backend per estrazione PDF AVM e generazione tagliandini S-89.
 
 import os
 from fastapi import FastAPI, UploadFile, File, HTTPException, Response, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
@@ -18,14 +16,38 @@ from generator import generate_pdf_bytes, generate_single_slip_bytes
 app = FastAPI(title="Jw School", version="1.0.0")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
+def _find_file(rel_path):
+    possible = [
+        os.path.join(BASE_DIR, rel_path),
+        os.path.join(os.getcwd(), rel_path),
+        os.path.join(os.path.dirname(BASE_DIR), rel_path),
+        os.path.join("/var/task", rel_path)
+    ]
+    for p in possible:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+@app.get("/static/{file_path:path}")
+async def get_static(file_path: str):
+    target = _find_file(os.path.join("static", file_path))
+    if target and os.path.isfile(target):
+        media_type = "text/css" if file_path.endswith(".css") else "application/javascript"
+        with open(target, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type=media_type)
+    raise HTTPException(status_code=404, detail="Static file not found")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    target = _find_file(os.path.join("templates", "index.html"))
+    if target and os.path.isfile(target):
+        with open(target, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>Jw School</h1><p>Index template not found</p>")
 
 
 class AssegnazioneModel(BaseModel):
@@ -39,11 +61,6 @@ class AssegnazioneModel(BaseModel):
 
 class GenerateRequestModel(BaseModel):
     assegnazioni: List[AssegnazioneModel]
-
-
-@app.get("/", response_class=HTMLResponse)
-async def read_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/api/extract")
@@ -121,7 +138,6 @@ async def generate_zip_pdf(payload: GenerateRequestModel):
         media_type="application/zip",
         headers={"Content-Disposition": "attachment; filename=S-89_Assegnazioni_Singole.zip"}
     )
-
 
 
 if __name__ == "__main__":
