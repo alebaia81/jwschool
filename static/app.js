@@ -122,10 +122,10 @@ function renderTable() {
     const filtered = assignmentsData.filter(a => {
         const matchesMonth = currentMonthFilter === 'Tutti' || a.mese === currentMonthFilter;
         const matchesSearch = !searchQuery ||
-            a.studente.toLowerCase().includes(searchQuery) ||
-            (a.assistente && a.assistente.toLowerCase().includes(searchQuery)) ||
-            a.data.toLowerCase().includes(searchQuery) ||
-            a.tipo.toLowerCase().includes(searchQuery);
+            (a.studente || '').toLowerCase().includes(searchQuery) ||
+            (a.assistente || '').toLowerCase().includes(searchQuery) ||
+            (a.data || '').toLowerCase().includes(searchQuery) ||
+            (a.tipo || '').toLowerCase().includes(searchQuery);
         return matchesMonth && matchesSearch;
     });
 
@@ -154,8 +154,10 @@ function renderTable() {
             <td>
                 <input type="text" class="cell-input" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
             </td>
-            <td class="text-center">
-                <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ Singolo</button>
+            <td class="text-center" style="white-space: nowrap;">
+                <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ Scarica</button>
+                <button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 WhatsApp</button>
+                <button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 Telegram</button>
             </td>
         `;
 
@@ -312,4 +314,40 @@ function escapeHtml(text) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+function sendWhatsApp(index) {
+    const item = assignmentsData[index];
+    if (!item) return;
+
+    let msg = `Ciao ${item.studente || ''}, ti ricordo la tua assegnazione per l'adunanza del ${item.data}:\n\n` +
+              `• Parte n. ${item.parte_n}: ${item.tipo}`;
+
+    if (item.assistente && item.assistente.trim()) {
+        msg += `\n• Assistente: ${item.assistente}`;
+    }
+
+    msg += `\n\nBuon lavoro!`;
+
+    const encodedMsg = encodeURIComponent(msg);
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMsg}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+function sendTelegram(index) {
+    const item = assignmentsData[index];
+    if (!item) return;
+
+    let msg = `Ciao ${item.studente || ''}, ti ricordo la tua assegnazione per l'adunanza del ${item.data}:\n\n` +
+              `• Parte n. ${item.parte_n}: ${item.tipo}`;
+
+    if (item.assistente && item.assistente.trim()) {
+        msg += `\n• Assistente: ${item.assistente}`;
+    }
+
+    msg += `\n\nBuon lavoro!`;
+
+    const encodedMsg = encodeURIComponent(msg);
+    const telegramUrl = `https://t.me/share/url?url=&text=${encodedMsg}`;
+    window.open(telegramUrl, '_blank');
 }
