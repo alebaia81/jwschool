@@ -509,4 +509,14 @@ body {
     .data-table tr.row-sent td:nth-child(4) {
         background: #133935 !important;
     }
+
+    /* Icone compatte solo su Mobile per risparmiare spazio */
+    .data-table .btn-text {
+        display: none;
+    }
+
+    .data-table .btn-icon {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
 }

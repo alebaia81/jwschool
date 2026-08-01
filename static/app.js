@@ -143,12 +143,12 @@ function renderTable() {
         }
 
         const waBtn = item.sentWhatsApp
-            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria WhatsApp inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentWhatsApp')">✅ Inviato WA</button>`
-            : `<button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 WhatsApp</button>`;
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria WhatsApp inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentWhatsApp')">✅ <span class="btn-text">Inviato WA</span></button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 <span class="btn-text">WhatsApp</span></button>`;
 
         const tgBtn = item.sentTelegram
-            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria Telegram inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ Inviato TG</button>`
-            : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 Telegram</button>`;
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria Telegram inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ <span class="btn-text">Inviato TG</span></button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 <span class="btn-text">Telegram</span></button>`;
 
         tr.innerHTML = `
             <td>
@@ -167,7 +167,7 @@ function renderTable() {
                 <input type="text" class="cell-input" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
             </td>
             <td class="text-center" style="white-space: nowrap;">
-                <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ Scarica</button>
+                <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ <span class="btn-text">Scarica</span></button>
                 ${waBtn}
                 ${tgBtn}
             </td>
@@ -369,8 +369,13 @@ function sendTelegram(index) {
     msg += `\n\nBuon lavoro!`;
 
     const encodedMsg = encodeURIComponent(msg);
-    const telegramUrl = `https://t.me/share/url?url=&text=${encodedMsg}`;
-    window.open(telegramUrl, '_blank');
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+        window.location.href = `tg://msg?text=${encodedMsg}`;
+    } else {
+        const telegramUrl = `https://t.me/share/url?url=&text=${encodedMsg}`;
+        window.open(telegramUrl, '_blank');
+    }
 }
 
 function toggleSentStatus(index, key) {
