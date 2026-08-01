@@ -642,14 +642,37 @@ body {
         background: #133935 !important;
     }
 
-    /* Icone compatte solo su Mobile per risparmiare spazio */
+    /* Header Right Actions Spacing su Mobile */
+    .header-right-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 6px;
+    }
+
+    .header-right-actions .btn {
+        width: auto;
+    }
+
+    /* Icone compatte e spaziatura ottimizzata su Mobile per non accavallarsi */
+    .data-table td:last-child {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        min-width: 130px;
+    }
+
     .data-table .btn-text {
         display: none;
     }
 
     .data-table .btn-icon {
-        padding: 8px 10px;
+        padding: 8px 12px;
         font-size: 14px;
+        margin: 0 2px;
     }
 
     /* Footer Privacy Link e Contatto a capo solo su Mobile */
