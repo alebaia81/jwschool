@@ -523,6 +523,41 @@ body {
     list-style-type: disc;
 }
 
+/* Help Steps Styles */
+.help-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.help-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+}
+
+.help-step-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.help-step-text strong {
+    color: var(--text-title);
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.help-step-text p {
+    color: var(--text-body);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
 .modal-footer {
     padding: 16px 24px;
     border-top: 1px solid var(--bg-card-border);
@@ -617,13 +652,15 @@ body {
         font-size: 14px;
     }
 
-    /* Footer Privacy Link a capo solo su Mobile */
-    .footer-privacy-span {
+    /* Footer Privacy Link e Contatto a capo solo su Mobile */
+    .footer-privacy-span,
+    .footer-contact-span {
         display: block;
         margin-top: 6px;
     }
 
-    .footer-privacy-span .footer-dot {
+    .footer-privacy-span .footer-dot,
+    .footer-contact-span .footer-dot {
         display: none;
     }
 }

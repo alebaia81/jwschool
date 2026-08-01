@@ -404,3 +404,20 @@ function closePrivacyModalOnOverlay(event) {
         closePrivacyModal();
     }
 }
+
+function openHelpModal(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('helpModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function closeHelpModalOnOverlay(event) {
+    if (event.target.id === 'helpModal') {
+        closeHelpModal();
+    }
+}

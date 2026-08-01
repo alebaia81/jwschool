@@ -20,8 +20,11 @@
                     <p class="subtitle">Generatore ed Editor Assegnazioni S-89</p>
                 </div>
             </div>
-            <div class="status-badge" id="statusBadge">
-                <span class="status-dot"></span> Pronto
+            <div class="header-right-actions" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="openHelpModal(event)">❓ Come si usa</button>
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span> Pronto
+                </div>
             </div>
         </header>
 
@@ -94,8 +97,47 @@
             <p>
                 Jw School &bull; Creato da <a href="https://alebaia81.github.io/alessandrobaiamonte/" target="_blank" rel="noopener noreferrer">Baiamonte Alessandro</a>
                 <span class="footer-privacy-span"><span class="footer-dot">&bull;</span> <a href="#" onclick="openPrivacyModal(event)">🔒 Privacy Policy</a></span>
+                <span class="footer-contact-span"><span class="footer-dot">&bull;</span> ✉️ Suggerimenti: <a href="mailto:alessandro.baiamonte@ikmail.com">alessandro.baiamonte@ikmail.com</a></span>
             </p>
         </footer>
+
+        <!-- Help Modal Popup -->
+        <div class="modal-overlay hidden" id="helpModal" onclick="closeHelpModalOnOverlay(event)">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>❓ Come si usa Jw School</h3>
+                    <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-steps">
+                        <div class="help-step">
+                            <div class="help-step-icon">1️⃣</div>
+                            <div class="help-step-text">
+                                <strong>Carica il PDF dell'AVM</strong>
+                                <p>Trascina o seleziona il file PDF della Vita e del Ministero (es. <em>AVM settembre-ottobre.pdf</em>) nell'area di caricamento in alto.</p>
+                            </div>
+                        </div>
+                        <div class="help-step">
+                            <div class="help-step-icon">2️⃣</div>
+                            <div class="help-step-text">
+                                <strong>Verifica o modifica i dati</strong>
+                                <p>L'app estrae automaticamente date, parti, studenti ed assistenti. Usa i tab dei mesi o la ricerca per filtrare, e modifica direttamente le celle se necessario.</p>
+                            </div>
+                        </div>
+                        <div class="help-step">
+                            <div class="help-step-icon">3️⃣</div>
+                            <div class="help-step-text">
+                                <strong>Scarica o Invia Promemoria</strong>
+                                <p>Scarica i biglietti S-89 compilati (singoli, mensili o l'archivio ZIP) oppure clicca su <strong>WhatsApp</strong> / <strong>Telegram</strong> per inviare il promemoria in 1 click!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closeHelpModal()">Inizia subito!</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Privacy Modal Popup -->
         <div class="modal-overlay hidden" id="privacyModal" onclick="closePrivacyModalOnOverlay(event)">
