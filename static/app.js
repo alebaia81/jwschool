@@ -387,3 +387,20 @@ function toggleSentStatus(index, key) {
     const statusText = item[key] ? 'marca come inviato' : 'ripristinato come da inviare';
     showToast(`🔄 Stato promemoria per ${item.studente}: ${statusText}`);
 }
+
+function openPrivacyModal(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('privacyModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closePrivacyModal() {
+    const modal = document.getElementById('privacyModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function closePrivacyModalOnOverlay(event) {
+    if (event.target.id === 'privacyModal') {
+        closePrivacyModal();
+    }
+}

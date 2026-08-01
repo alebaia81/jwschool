@@ -91,8 +91,33 @@
 
         <!-- Footer -->
         <footer class="app-footer">
-            <p>Jw School &bull; Creato da <a href="https://alebaia81.github.io/alessandrobaiamonte/" target="_blank" rel="noopener noreferrer">Baiamonte Alessandro</a></p>
+            <p>
+                Jw School &bull; Creato da <a href="https://alebaia81.github.io/alessandrobaiamonte/" target="_blank" rel="noopener noreferrer">Baiamonte Alessandro</a>
+                &bull; <a href="#" onclick="openPrivacyModal(event)">🔒 Privacy Policy</a>
+            </p>
         </footer>
+
+        <!-- Privacy Modal Popup -->
+        <div class="modal-overlay hidden" id="privacyModal" onclick="closePrivacyModalOnOverlay(event)">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>🔒 Informativa sulla Privacy</h3>
+                    <button class="modal-close" onclick="closePrivacyModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Jw School</strong> è stata progettata con un approccio al 100% orientato alla tutela della privacy ed alla sicurezza dei dati personali (in conformità al GDPR):</p>
+                    <ul class="privacy-list">
+                        <li><strong>🛡️ Nessuna archiviazione su server:</strong> I file PDF caricati ed i dati delle assegnazioni vengono elaborati direttamente nella memoria temporanea del tuo browser. Nessun nome o dato personale viene conservato in database cloud o server di terze parti.</li>
+                        <li><strong>🔒 Controllo totale dei dati:</strong> I nomi degli studenti e le informazioni sulle assegnazioni rimangono esclusivamente sotto il tuo diretto controllo sul tuo dispositivo.</li>
+                        <li><strong>🚫 Zero tracciamento:</strong> L'applicazione non utilizza cookie di profilazione né strumenti di tracciamento o pubblicità di terze parti.</li>
+                        <li><strong>💬 Messaggistica sicura:</strong> I promemoria inviati tramite WhatsApp o Telegram sfruttano i protocolli ufficiali di condivisione diretta dal tuo telefono o computer.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closePrivacyModal()">Ho capito</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Notification Toast -->
