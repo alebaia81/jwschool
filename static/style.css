@@ -616,4 +616,14 @@ body {
         padding: 8px 10px;
         font-size: 14px;
     }
+
+    /* Footer Privacy Link a capo solo su Mobile */
+    .footer-privacy-span {
+        display: block;
+        margin-top: 6px;
+    }
+
+    .footer-privacy-span .footer-dot {
+        display: none;
+    }
 }
