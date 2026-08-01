@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jw School — Generatore Assegnazioni S-89</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">📜</div>
+                <div>
+                    <h1>Jw School</h1>
+                    <p class="subtitle">Generatore ed Editor Assegnazioni S-89</p>
+                </div>
+            </div>
+            <div class="status-badge" id="statusBadge">
+                <span class="status-dot"></span> Pronto
+            </div>
+        </header>
+
+        <!-- Dropzone Section -->
+        <section class="upload-section" id="uploadSection">
+            <div class="dropzone" id="dropzone">
+                <input type="file" id="fileInput" accept=".pdf" class="file-input">
+                <div class="dropzone-content">
+                    <div class="upload-icon">📄</div>
+                    <h3>Trascina qui il file PDF dell'AVM</h3>
+                    <p>Oppure clicca per selezionare il programma dal computer (es. <code>AVM settembre-ottobre.pdf</code>)</p>
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Seleziona PDF</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loader -->
+        <div class="loader-container hidden" id="loader">
+            <div class="spinner"></div>
+            <p>Analisi ed estrazione delle assegnazioni in corso...</p>
+        </div>
+
+        <!-- Assignments Editor Section -->
+        <section class="editor-section hidden" id="editorSection">
+            <div class="section-header">
+                <div>
+                    <h2>Assegnazioni Estratte</h2>
+                    <p id="extractionSummary">Verifica e modifica le assegnazioni prima di scaricare i biglietti S-89.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btnGenerateZip">📦 Scarica Singole (ZIP)</button>
+                    <button class="btn btn-success btn-pulse" id="btnGenerateAll">📥 Scarica PDF Mensile</button>
+                </div>
+            </div>
+
+            <!-- Filter / Stats Bar -->
+            <div class="filter-bar">
+                <div class="month-tabs" id="monthTabs">
+                    <!-- Dynamic Month Tabs -->
+                </div>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Cerca studente o assistente...">
+                </div>
+            </div>
+
+            <!-- Assignments Table Card -->
+            <div class="card table-card">
+                <div class="table-responsive">
+                    <table class="data-table" id="assignmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Data Adunanza</th>
+                                <th>Parte</th>
+                                <th>Tipo di Assegnazione</th>
+                                <th>Studente (Nome e Cognome)</th>
+                                <th>Assistente</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Rows populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Jw School &bull; Creato da <a href="https://alebaia81.github.io/alessandrobaiamonte/" target="_blank" rel="noopener noreferrer">Baiamonte Alessandro</a></p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
