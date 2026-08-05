@@ -36,7 +36,10 @@
                     <div class="upload-icon">📄</div>
                     <h3>Trascina qui il file PDF dell'AVM</h3>
                     <p>Oppure clicca per selezionare il programma dal computer (es. <code>AVM settembre-ottobre.pdf</code>)</p>
-                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Seleziona PDF</button>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px;">
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Seleziona PDF</button>
+                        <button class="btn btn-secondary" onclick="addManualAssignment()">✍️ Inserisci Assegnazione (da zero)</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -55,6 +58,7 @@
                     <p id="extractionSummary">Verifica e modifica le assegnazioni prima di scaricare i biglietti S-89.</p>
                 </div>
                 <div class="header-actions">
+                    <button class="btn btn-secondary" id="btnAddManual" onclick="addManualAssignment()">➕ Nuova Assegnazione</button>
                     <button class="btn btn-primary" id="btnGenerateZip">📦 Scarica Assegnazioni (ZIP)</button>
                     <button class="btn btn-success btn-pulse" id="btnGenerateAll">📥 Scarica Assegnazioni del Mese</button>
                 </div>
@@ -113,22 +117,22 @@
                         <div class="help-step">
                             <div class="help-step-icon">1️⃣</div>
                             <div class="help-step-text">
-                                <strong>Carica il PDF dell'AVM</strong>
-                                <p>Trascina o seleziona il file PDF della Vita e del Ministero (es. <em>AVM settembre-ottobre.pdf</em>) nell'area di caricamento in alto.</p>
+                                <strong>Carica il PDF dell'AVM o Crea da Zero</strong>
+                                <p>Trascina il PDF ufficiale dell'AVM nell'area di caricamento, oppure clicca su <strong>✍️ Inserisci Assegnazione (da zero)</strong> per compilare il programma manualmente senza PDF.</p>
                             </div>
                         </div>
                         <div class="help-step">
                             <div class="help-step-icon">2️⃣</div>
                             <div class="help-step-text">
-                                <strong>Verifica o modifica i dati</strong>
-                                <p>L'app estrae automaticamente date, parti, studenti ed assistenti. Usa i tab dei mesi o la ricerca per filtrare, e modifica direttamente le celle se necessario.</p>
+                                <strong>Verifica, Modifica & Controllo Ripetizioni</strong>
+                                <p>L'app separa visivamente le settimane con <strong>linee spesse e badge colorati</strong>. Se uno studente ha 2 o più parti nel bimestre, l'app lo evidenzia automaticamente in <strong style="color: #ef4444;">rosso ⚠️ 2x</strong>. Puoi anche aggiungere (<strong>➕</strong>), modificare o eliminare (<strong>🗑️</strong>) qualsiasi riga.</p>
                             </div>
                         </div>
                         <div class="help-step">
                             <div class="help-step-icon">3️⃣</div>
                             <div class="help-step-text">
-                                <strong>Scarica o Invia Promemoria</strong>
-                                <p>Scarica i biglietti S-89 compilati (singoli, mensili o l'archivio ZIP) oppure clicca su <strong>WhatsApp</strong> / <strong>Telegram</strong> per inviare il promemoria in 1 click!</p>
+                                <strong>Scarica S-89 o Invia Promemoria</strong>
+                                <p>Scarica i fogli A4 compilati dei biglietti S-89 (mensili, singoli o archivio ZIP), oppure usa i pulsanti compatti <strong>💬 WA</strong> e <strong>💬 TG</strong> per inviare il promemoria in 1 click!</p>
                             </div>
                         </div>
                     </div>

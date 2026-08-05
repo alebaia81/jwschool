@@ -110,6 +110,29 @@ function buildMonthTabs() {
     });
 }
 
+function calculateStudentFrequencies(data) {
+    const freq = {};
+    data.forEach(item => {
+        const stud = (item.studente || '').trim();
+        const ass = (item.assistente || '').trim();
+
+        if (stud) {
+            const key = stud.toLowerCase();
+            if (!freq[key]) freq[key] = { name: stud, studentCount: 0, assistantCount: 0, studentDates: [], assistantDates: [] };
+            freq[key].studentCount++;
+            freq[key].studentDates.push(item.data);
+        }
+
+        if (ass) {
+            const key = ass.toLowerCase();
+            if (!freq[key]) freq[key] = { name: ass, studentCount: 0, assistantCount: 0, studentDates: [], assistantDates: [] };
+            freq[key].assistantCount++;
+            freq[key].assistantDates.push(item.data);
+        }
+    });
+    return freq;
+}
+
 function renderTable() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
@@ -118,6 +141,14 @@ function renderTable() {
     const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
     tableBody.innerHTML = '';
+
+    const frequencies = calculateStudentFrequencies(assignmentsData);
+
+    const uniqueDates = [...new Set(assignmentsData.map(a => a.data))];
+    const dateColorMap = {};
+    uniqueDates.forEach((d, idx) => {
+        dateColorMap[d] = idx % 5;
+    });
 
     const filtered = assignmentsData.filter(a => {
         const matchesMonth = currentMonthFilter === 'Tutti' || a.mese === currentMonthFilter;
@@ -134,42 +165,84 @@ function renderTable() {
         return;
     }
 
+    let prevDate = null;
+
     filtered.forEach((item) => {
         const realIndex = assignmentsData.indexOf(item);
         const tr = document.createElement('tr');
+
+        const isNewWeek = prevDate !== null && item.data !== prevDate;
+        if (isNewWeek) {
+            tr.classList.add('week-divider-row');
+        }
+        prevDate = item.data;
 
         if (item.sentWhatsApp || item.sentTelegram) {
             tr.classList.add('row-sent');
         }
 
+        const dateColorIdx = dateColorMap[item.data] !== undefined ? dateColorMap[item.data] : 0;
+
+        const studKey = (item.studente || '').trim().toLowerCase();
+        const studStats = frequencies[studKey];
+        let studClass = 'cell-input student-input';
+        let studBadgeHtml = '';
+
+        if (studStats && studStats.studentCount >= 2) {
+            studClass += ' input-repeat-red';
+            const datesList = studStats.studentDates.join(', ');
+            studBadgeHtml = `<span class="repeat-badge-red" title="Attenzione: ${studStats.studentCount} parti da Studente (${escapeHtml(datesList)})">⚠️ ${studStats.studentCount}x</span>`;
+        }
+
+        const assKey = (item.assistente || '').trim().toLowerCase();
+        const assStats = frequencies[assKey];
+        let assClass = 'cell-input assistant-input';
+        let assBadgeHtml = '';
+
+        if (assKey && assStats && assStats.studentCount > 0) {
+            assClass += ' input-role-mix';
+            const studDates = assStats.studentDates.join(', ');
+            assBadgeHtml = `<span class="role-badge-mix" title="Partecipa anche come Studente (${escapeHtml(studDates)})">ℹ️ S+A</span>`;
+        }
+
         const waBtn = item.sentWhatsApp
-            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria WhatsApp inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentWhatsApp')">✅ <span class="btn-text">Inviato WA</span></button>`
-            : `<button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 <span class="btn-text">WhatsApp</span></button>`;
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff; padding: 5px 8px;" title="Promemoria WhatsApp inviato!" onclick="toggleSentStatus(${realIndex}, 'sentWhatsApp')">✅ WA</button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #25d366; border-color: #25d366; color: #ffffff; padding: 5px 8px;" title="Invia promemoria via WhatsApp" onclick="sendWhatsApp(${realIndex})">💬 WA</button>`;
 
         const tgBtn = item.sentTelegram
-            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff;" title="Promemoria Telegram inviato! Clicca per reinviare o disattivare" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ <span class="btn-text">Inviato TG</span></button>`
-            : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 <span class="btn-text">Telegram</span></button>`;
+            ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff; padding: 5px 8px;" title="Promemoria Telegram inviato!" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ TG</button>`
+            : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff; padding: 5px 8px;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 TG</button>`;
 
         tr.innerHTML = `
             <td>
-                <input type="text" class="cell-input" value="${escapeHtml(item.data)}" onchange="updateItem(${realIndex}, 'data', this.value)">
+                <div class="cell-input-container">
+                    <span class="date-badge date-badge-${dateColorIdx}" title="Badge Settimana">📅</span>
+                    <input type="text" class="cell-input" style="font-weight:600;" value="${escapeHtml(item.data)}" onchange="updateItem(${realIndex}, 'data', this.value)">
+                </div>
             </td>
-            <td>
+            <td class="text-center">
                 <span class="badge-part">Parte ${escapeHtml(item.parte_n)}</span>
             </td>
             <td>
                 <input type="text" class="cell-input" value="${escapeHtml(item.tipo)}" onchange="updateItem(${realIndex}, 'tipo', this.value)">
             </td>
             <td>
-                <input type="text" class="cell-input" style="font-weight:600;" value="${escapeHtml(item.studente)}" onchange="updateItem(${realIndex}, 'studente', this.value)">
+                <div class="cell-input-container">
+                    <input type="text" class="${studClass}" style="font-weight:600;" value="${escapeHtml(item.studente)}" onchange="updateItem(${realIndex}, 'studente', this.value)">
+                    ${studBadgeHtml}
+                </div>
             </td>
             <td>
-                <input type="text" class="cell-input" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
+                <div class="cell-input-container">
+                    <input type="text" class="${assClass}" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
+                    ${assBadgeHtml}
+                </div>
             </td>
             <td class="text-center" style="white-space: nowrap;">
-                <button class="btn btn-secondary btn-icon" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️ <span class="btn-text">Scarica</span></button>
+                <button class="btn btn-secondary btn-icon" style="padding: 5px 8px;" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️</button>
                 ${waBtn}
                 ${tgBtn}
+                <button class="btn btn-secondary btn-icon" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 5px 8px;" title="Elimina Assegnazione" onclick="deleteAssignment(${realIndex})">🗑️</button>
             </td>
         `;
 
@@ -177,16 +250,76 @@ function renderTable() {
     });
 
     const sentCount = assignmentsData.filter(a => a.sentWhatsApp || a.sentTelegram).length;
+    const repeatCount = Object.values(frequencies).filter(f => f.studentCount >= 2).length;
     const summaryElem = document.getElementById('extractionSummary');
     if (summaryElem) {
-        summaryElem.innerText = `Visualizzando ${filtered.length} di ${assignmentsData.length} assegnazioni totali • Promemoria inviati: ${sentCount} di ${assignmentsData.length}`;
+        summaryElem.innerText = `Visualizzando ${filtered.length} di ${assignmentsData.length} assegnazioni totali • Studenti con 2+ parti: ${repeatCount} • Promemoria inviati: ${sentCount} di ${assignmentsData.length}`;
+    }
+}
+
+function addManualAssignment() {
+    showEditor(true);
+
+    let defaultDate = "9 settembre 2026";
+    let defaultMonth = "Settembre";
+    let defaultParte = "4";
+
+    if (assignmentsData.length > 0) {
+        const last = assignmentsData[assignmentsData.length - 1];
+        defaultDate = last.data || defaultDate;
+        defaultMonth = last.mese || defaultMonth;
+        const lastParteNum = parseInt(last.parte_n, 10);
+        if (!isNaN(lastParteNum)) {
+            defaultParte = String(lastParteNum + 1);
+        }
+    }
+
+    // Estrai il mese dalla data se disponibile
+    if (defaultDate) {
+        const parts = defaultDate.split(' ');
+        if (parts.length >= 2) {
+            defaultMonth = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+        }
+    }
+
+    const newItem = {
+        data: defaultDate,
+        mese: defaultMonth,
+        parte_n: defaultParte,
+        tipo: "Iniziare una conversazione (3 min)",
+        studente: "",
+        assistente: ""
+    };
+
+    assignmentsData.push(newItem);
+    buildMonthTabs();
+    renderTable();
+    showToast('➕ Nuova assegnazione aggiunta! Compila i campi nella riga inserita.');
+}
+
+function deleteAssignment(index) {
+    if (assignmentsData[index]) {
+        const removed = assignmentsData.splice(index, 1);
+        buildMonthTabs();
+        renderTable();
+        showToast('🗑️ Assegnazione eliminata');
     }
 }
 
 function updateItem(index, key, value) {
     if (assignmentsData[index]) {
         assignmentsData[index][key] = value;
+        if (key === 'data') {
+            const parts = value.split(' ');
+            if (parts.length >= 2) {
+                assignmentsData[index].mese = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+            }
+        }
         showToast(`✏️ Aggiornata assegnazione per ${assignmentsData[index].studente || 'lo studente'}`);
+        if (key === 'studente' || key === 'assistente' || key === 'data') {
+            buildMonthTabs();
+            renderTable();
+        }
     }
 }
 

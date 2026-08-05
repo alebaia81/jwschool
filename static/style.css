@@ -37,7 +37,7 @@ body {
 }
 
 .app-container {
-    max-width: 1200px;
+    max-width: 1450px;
     margin: 0 auto;
     width: 100%;
     display: flex;
@@ -335,9 +335,10 @@ body {
 
 .data-table {
     width: 100%;
+    table-layout: auto;
     border-collapse: collapse;
     text-align: left;
-    font-size: 14px;
+    font-size: 13.5px;
 }
 
 .data-table th {
@@ -347,17 +348,24 @@ body {
     background: #0f172a;
     color: var(--text-body);
     font-weight: 600;
-    padding: 14px 18px;
+    padding: 10px 10px;
     border-bottom: 1px solid var(--bg-card-border);
     white-space: nowrap;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .data-table td {
-    padding: 12px 18px;
+    padding: 8px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: middle;
 }
+
+.data-table th:nth-child(1), .data-table td:nth-child(1) { width: 15%; }
+.data-table th:nth-child(2), .data-table td:nth-child(2) { width: 6%; text-align: center; }
+.data-table th:nth-child(3), .data-table td:nth-child(3) { width: 27%; }
+.data-table th:nth-child(4), .data-table td:nth-child(4) { width: 21%; }
+.data-table th:nth-child(5), .data-table td:nth-child(5) { width: 19%; }
+.data-table th:nth-child(6), .data-table td:nth-child(6) { width: 12%; text-align: center; }
 
 .data-table tr:hover {
     background: rgba(255, 255, 255, 0.03);
@@ -388,14 +396,19 @@ body {
 }
 
 .badge-part {
-    display: inline-block;
-    padding: 4px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 14px;
     background: rgba(79, 70, 229, 0.2);
     border: 1px solid rgba(79, 70, 229, 0.4);
     color: #a5b4fc;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 auto;
+    letter-spacing: 0.3px;
 }
 
 .text-center {
@@ -687,3 +700,100 @@ body {
         display: none;
     }
 }
+
+/* ==========================================================================
+   Week Visual Separation & Student Repeat Warning Badges
+   ========================================================================== */
+
+/* Separatore visivo spesso tra settimane diverse */
+.data-table tr.week-divider-row td {
+    border-top: 3px solid #6366f1 !important;
+    padding-top: 14px;
+}
+
+/* Badge della data con colori alternati */
+.date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.date-badge-0 { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); }
+.date-badge-1 { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+.date-badge-2 { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+.date-badge-3 { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+.date-badge-4 { background: rgba(14, 165, 233, 0.2); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.4); }
+
+/* Wrapper di input con indicatore di avviso */
+.cell-input-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.cell-input-container input {
+    flex: 1 1 auto;
+    min-width: 110px;
+}
+
+/* Evidenziazione in rosso per Studente Ripetuto (≥2 volte) */
+.data-table input.input-repeat-red {
+    background-color: rgba(220, 38, 38, 0.2) !important;
+    border: 1.5px solid #ef4444 !important;
+    color: #fca5a5 !important;
+    font-weight: 600;
+}
+
+.repeat-badge-red {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 12px;
+    cursor: help;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
+    white-space: nowrap;
+    flex-shrink: 0;
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: 0.9; }
+}
+
+/* Badge Ruolo Misto (Studente + Assistente) */
+.data-table input.input-role-mix {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    border: 1.5px solid #c084fc !important;
+    color: #e9d5ff !important;
+}
+
+.role-badge-mix {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(168, 85, 247, 0.25);
+    color: #e9d5ff;
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    cursor: help;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+
