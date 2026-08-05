@@ -257,13 +257,13 @@ assegnazioni = [
 
     # --- 28 ottobre | GEREMIA 47-48 ---
     {"data": "28 ottobre 2026", "mese": "Ottobre", "parte_n": "3",
-     "tipo": "Lettura biblica (4 min o meno)", "studente": "Freddi I.", "assistente": ""},
+     "tipo": "Lettura biblica (4 min o meno)", "studente": "Sirianni L.", "assistente": ""},
     {"data": "28 ottobre 2026", "mese": "Ottobre", "parte_n": "4",
-     "tipo": "Iniziare una conversazione (4 min)", "studente": "Sirianni S.", "assistente": "Di Lallo C."},
+     "tipo": "Iniziare una conversazione (4 min)", "studente": "Uggetti N.", "assistente": "Paganuzzi I."},
     {"data": "28 ottobre 2026", "mese": "Ottobre", "parte_n": "5",
-     "tipo": "Coltivare l'interesse (4 min)", "studente": "Doro R.", "assistente": "Merli L."},
+     "tipo": "Coltivare l'interesse (4 min)", "studente": "Romanini L.", "assistente": "Ghilardotti T."},
     {"data": "28 ottobre 2026", "mese": "Ottobre", "parte_n": "6",
-     "tipo": "Fare discepoli (5 min)", "studente": "Tilaro C.", "assistente": ""},
+     "tipo": "Fare discepoli (5 min)", "studente": "Romano I.", "assistente": "Xhelo S."},
 ]
 
 

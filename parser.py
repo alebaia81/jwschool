@@ -73,36 +73,46 @@ def _parse_by_sections(full_text):
             vita_pos = block_text.find('VITA CRISTIANA')
             min_text = block_text[min_pos:(vita_pos if vita_pos != -1 else len(block_text))]
 
-            # Unisci righe spezzate come '(4 \n min)' in '(4 min)'
-            min_text_clean = re.sub(r'\(\s*(\d+)\s*\n\s*min\s*(?:o meno)?\s*\)', r'(\1 min)', min_text)
+            # Unisci righe spezzate nei titoli
+            cleaned = min_text
+            cleaned = re.sub(r'([\uf0b7•]\s*[^\n\(\)]+)\n+\s*(\(\s*\d+\s*min)', r'\1 \2', cleaned)
+            cleaned = re.sub(r'\(\s*(\d+)\s*\n+\s*min\s*(?:o meno)?\s*\)', r'(\1 min)', cleaned)
 
-            lines = min_text_clean.splitlines()
             titoli = []
             nomi = []
 
-            for line in lines:
-                l_str = line.strip()
-                if not l_str or 'EFFICACI' in l_str:
+            lines = cleaned.splitlines()
+            idx_line = 0
+            while idx_line < len(lines):
+                line = lines[idx_line].strip()
+                if not line or 'EFFICACI' in line:
+                    idx_line += 1
                     continue
 
                 # Caso speciale: Titolo e Studente sulla STESSA riga
-                # es. "• Fare discepoli (5 min) Studente/Assistente Tilaro C."
-                same_line_match = re.search(r'([\uf0b7•]?\s*[A-ZÀÈÉÌÒÙa-zàèéìòù\'’\?\!\s]+\(\s*\d+\s*min\s*(?:o meno)?\s*\))\s*Studente(?:/Assistente)?:?\s*(.*)', l_str)
+                same_line_match = re.search(r'([\uf0b7•]?\s*[A-ZÀÈÉÌÒÙa-zàèéìòù\'’\?\!\s]+\(\s*\d+\s*min\s*(?:o meno)?\s*\))\s*Studente(?:/Assistente)?:?\s*(.*)', line)
                 if same_line_match:
                     t = ' '.join(same_line_match.group(1).replace('•', '').replace('\uf0b7', '').split())
                     n = same_line_match.group(2).strip()
                     titoli.append(t)
                     nomi.append(n)
-                elif '(' in l_str and 'min' in l_str:
-                    t = ' '.join(l_str.replace('•', '').replace('\uf0b7', '').split())
-                    if 'Lettura' not in t and t not in titoli:
+                elif '•' in line or '\uf0b7' in line or ('(' in line and 'min' in line):
+                    t_candidate = line
+                    if not ('(' in t_candidate and 'min' in t_candidate) and idx_line + 1 < len(lines):
+                        next_line = lines[idx_line + 1].strip()
+                        if '(' in next_line and 'min' in next_line:
+                            t_candidate = t_candidate + ' ' + next_line
+                            idx_line += 1
+                    t = ' '.join(t_candidate.replace('•', '').replace('\uf0b7', '').split())
+                    if 'Lettura' not in t and t:
                         titoli.append(t)
-                elif 'Studente/Assistente' in l_str:
-                    rest = l_str.replace('Studente/Assistente:', '').replace('Studente/Assistente', '').strip()
+                elif 'Studente/Assistente' in line:
+                    rest = line.replace('Studente/Assistente:', '').replace('Studente/Assistente', '').strip()
                     if rest:
                         nomi.append(rest)
-                elif l_str and not l_str.startswith('•') and not l_str.startswith('\uf0b7') and 'min)' not in l_str:
-                    nomi.append(l_str)
+                elif line and not line.startswith('•') and not line.startswith('\uf0b7') and 'min)' not in line:
+                    nomi.append(line)
+                idx_line += 1
 
             for p_idx, titolo in enumerate(titoli):
                 n = nomi[p_idx] if p_idx < len(nomi) else ""
@@ -125,3 +135,4 @@ def _parse_by_sections(full_text):
                 parte_n += 1
 
     return assegnazioni
+
