@@ -191,7 +191,7 @@ function renderTable() {
         if (studStats && studStats.studentCount >= 2) {
             studClass += ' input-repeat-red';
             const datesList = studStats.studentDates.join(', ');
-            studBadgeHtml = `<span class="repeat-badge-red" title="Attenzione: ${studStats.studentCount} parti da Studente (${escapeHtml(datesList)})">⚠️ ${studStats.studentCount}x</span>`;
+            studBadgeHtml = `<span class="repeat-badge-red" title="Clicca per vedere le adunanze di ${escapeHtml(item.studente)}" onclick="showStudentPopover(event, '${escapeHtml(item.studente)}')">⚠️ ${studStats.studentCount}x</span>`;
         }
 
         const assKey = (item.assistente || '').trim().toLowerCase();
@@ -202,7 +202,7 @@ function renderTable() {
         if (assKey && assStats && assStats.studentCount > 0) {
             assClass += ' input-role-mix';
             const studDates = assStats.studentDates.join(', ');
-            assBadgeHtml = `<span class="role-badge-mix" title="Partecipa anche come Studente (${escapeHtml(studDates)})">ℹ️ S+A</span>`;
+            assBadgeHtml = `<span class="role-badge-mix" title="Clicca per vedere le adunanze di ${escapeHtml(item.assistente)}" onclick="showStudentPopover(event, '${escapeHtml(item.assistente)}')">ℹ️ S+A</span>`;
         }
 
         const waBtn = item.sentWhatsApp
@@ -212,6 +212,9 @@ function renderTable() {
         const tgBtn = item.sentTelegram
             ? `<button class="btn btn-primary btn-icon" style="background: #10b981; border-color: #10b981; color: #ffffff; padding: 5px 8px;" title="Promemoria Telegram inviato!" onclick="toggleSentStatus(${realIndex}, 'sentTelegram')">✅ TG</button>`
             : `<button class="btn btn-primary btn-icon" style="background: #0088cc; border-color: #0088cc; color: #ffffff; padding: 5px 8px;" title="Invia promemoria via Telegram" onclick="sendTelegram(${realIndex})">💬 TG</button>`;
+
+        const studFilterBtn = item.studente ? `<button class="btn-filter-name" title="Filtra tutte le parti di ${escapeHtml(item.studente)}" onclick="filterByName('${escapeHtml(item.studente)}')">🔍</button>` : '';
+        const assFilterBtn = item.assistente ? `<button class="btn-filter-name" title="Filtra tutte le parti di ${escapeHtml(item.assistente)}" onclick="filterByName('${escapeHtml(item.assistente)}')">🔍</button>` : '';
 
         tr.innerHTML = `
             <td>
@@ -229,12 +232,14 @@ function renderTable() {
             <td>
                 <div class="cell-input-container">
                     <input type="text" class="${studClass}" style="font-weight:600;" value="${escapeHtml(item.studente)}" onchange="updateItem(${realIndex}, 'studente', this.value)">
+                    ${studFilterBtn}
                     ${studBadgeHtml}
                 </div>
             </td>
             <td>
                 <div class="cell-input-container">
                     <input type="text" class="${assClass}" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
+                    ${assFilterBtn}
                     ${assBadgeHtml}
                 </div>
             </td>
@@ -554,3 +559,103 @@ function closeHelpModalOnOverlay(event) {
         closeHelpModal();
     }
 }
+
+/* Popover Dettaglio Partecipazioni Studente */
+function showStudentPopover(event, name) {
+    if (event) event.stopPropagation();
+    closeStudentPopover();
+
+    if (!name || !name.trim()) return;
+    const key = name.trim().toLowerCase();
+    const frequencies = calculateStudentFrequencies(assignmentsData);
+    const stats = frequencies[key];
+
+    if (!stats) return;
+
+    const list = [];
+    assignmentsData.forEach(item => {
+        if ((item.studente || '').trim().toLowerCase() === key) {
+            list.push({ data: item.data, parte: item.parte_n, tipo: item.tipo, role: 'Studente' });
+        }
+        if ((item.assistente || '').trim().toLowerCase() === key) {
+            list.push({ data: item.data, parte: item.parte_n, tipo: item.tipo, role: 'Assistente' });
+        }
+    });
+
+    const popover = document.createElement('div');
+    popover.id = 'studentPopover';
+    popover.className = 'student-popover';
+
+    const itemsHtml = list.map(entry => `
+        <li class="student-popover-item">
+            <div>
+                <strong>📅 ${escapeHtml(entry.data)}</strong> &bull; Parte ${escapeHtml(entry.parte)}
+                <div style="font-size: 11px; color: var(--text-body); margin-top: 2px;">${escapeHtml(entry.tipo)}</div>
+            </div>
+            <span class="badge-role-tag ${entry.role === 'Studente' ? 'tag-student' : 'tag-assistant'}">${entry.role}</span>
+        </li>
+    `).join('');
+
+    const safeName = escapeHtml(name).replace(/'/g, "\\'");
+
+    popover.innerHTML = `
+        <div class="student-popover-header">
+            <div>
+                <strong>👤 ${escapeHtml(name)}</strong>
+                <div style="font-size: 11px; color: var(--text-body); margin-top: 2px;">
+                    ${stats.studentCount}x Studente &bull; ${stats.assistantCount}x Assistente
+                </div>
+            </div>
+            <button class="student-popover-close" onclick="closeStudentPopover()">&times;</button>
+        </div>
+        <ul class="student-popover-list">
+            ${itemsHtml}
+        </ul>
+        <div style="margin-top: 12px; text-align: right;">
+            <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" onclick="filterByName('${safeName}'); closeStudentPopover();">🔍 Filtra nella tabella</button>
+        </div>
+    `;
+
+    document.body.appendChild(popover);
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const popoverWidth = 320;
+    const popoverHeight = popover.offsetHeight || 220;
+
+    let left = rect.left;
+    let top = rect.bottom + 6;
+
+    // Se il popover va oltre il bordo inferiore dello schermo, posizionalo SOPRA il badge
+    if (rect.bottom + popoverHeight + 10 > window.innerHeight) {
+        top = rect.top - popoverHeight - 6;
+    }
+
+    if (left + popoverWidth > window.innerWidth - 20) {
+        left = window.innerWidth - popoverWidth - 20;
+    }
+
+    popover.style.position = 'fixed';
+    popover.style.left = `${Math.max(10, left)}px`;
+    popover.style.top = `${Math.max(10, top)}px`;
+}
+
+function closeStudentPopover() {
+    const existing = document.getElementById('studentPopover');
+    if (existing) existing.remove();
+}
+
+function filterByName(name) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = name;
+        renderTable();
+        showToast(`🔍 Filtrate assegnazioni per: ${name}`);
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#studentPopover') && !e.target.closest('.repeat-badge-red') && !e.target.closest('.role-badge-mix')) {
+        closeStudentPopover();
+    }
+});
+
