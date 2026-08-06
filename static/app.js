@@ -243,11 +243,13 @@ function renderTable() {
                     ${assBadgeHtml}
                 </div>
             </td>
-            <td class="text-center" style="white-space: nowrap;">
-                <button class="btn btn-secondary btn-icon" style="padding: 5px 8px;" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️</button>
-                ${waBtn}
-                ${tgBtn}
-                <button class="btn btn-secondary btn-icon" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 5px 8px;" title="Elimina Assegnazione" onclick="deleteAssignment(${realIndex})">🗑️</button>
+            <td class="text-center">
+                <div class="action-buttons-container">
+                    <button class="btn btn-secondary btn-icon" style="padding: 5px 8px;" title="Scarica Biglietto Singolo S-89" onclick="generateSinglePdf(${realIndex})">🖨️</button>
+                    ${waBtn}
+                    ${tgBtn}
+                    <button class="btn btn-secondary btn-icon" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 5px 8px;" title="Elimina Assegnazione" onclick="deleteAssignment(${realIndex})">🗑️</button>
+                </div>
             </td>
         `;
 
