@@ -240,7 +240,7 @@ function renderTable() {
             </td>
             <td>
                 <div class="cell-input-container">
-                    <input type="text" class="${assClass}" value="${escapeHtml(item.assistente || '')}" placeholder="Nessun assistente" onchange="updateItem(${realIndex}, 'assistente', this.value)">
+                    <input type="text" class="${assClass}" value="${escapeHtml(item.assistente || '')}" placeholder="Nessuno" onchange="updateItem(${realIndex}, 'assistente', this.value)">
                     ${assFilterBtn}
                     ${assBadgeHtml}
                 </div>
