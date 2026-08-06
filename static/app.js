@@ -216,11 +216,13 @@ function renderTable() {
         const studFilterBtn = item.studente ? `<button class="btn-filter-name" title="Filtra tutte le parti di ${escapeHtml(item.studente)}" onclick="filterByName('${escapeHtml(item.studente)}')">🔍</button>` : '';
         const assFilterBtn = item.assistente ? `<button class="btn-filter-name" title="Filtra tutte le parti di ${escapeHtml(item.assistente)}" onclick="filterByName('${escapeHtml(item.assistente)}')">🔍</button>` : '';
 
+        const displayDate = (item.data || '').replace(/\s+20\d\d$/i, '').trim();
+
         tr.innerHTML = `
             <td>
                 <div class="cell-input-container">
                     <span class="date-badge date-badge-${dateColorIdx}" title="Badge Settimana">📅</span>
-                    <input type="text" class="cell-input" style="font-weight:600;" value="${escapeHtml(item.data)}" onchange="updateItem(${realIndex}, 'data', this.value)">
+                    <input type="text" class="cell-input" style="font-weight:600;" value="${escapeHtml(displayDate)}" onchange="updateItem(${realIndex}, 'data', this.value)">
                 </div>
             </td>
             <td class="text-center">
@@ -315,13 +317,17 @@ function deleteAssignment(index) {
 
 function updateItem(index, key, value) {
     if (assignmentsData[index]) {
-        assignmentsData[index][key] = value;
+        let val = (value || '').trim();
         if (key === 'data') {
-            const parts = value.split(' ');
+            if (val && !/\b20\d\d\b/.test(val)) {
+                val = `${val} 2026`;
+            }
+            const parts = val.split(' ');
             if (parts.length >= 2) {
                 assignmentsData[index].mese = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
             }
         }
+        assignmentsData[index][key] = val;
         showToast(`✏️ Aggiornata assegnazione per ${assignmentsData[index].studente || 'lo studente'}`);
         if (key === 'studente' || key === 'assistente' || key === 'data') {
             buildMonthTabs();
